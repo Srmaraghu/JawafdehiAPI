@@ -267,11 +267,11 @@ class CIAADraftCaseService:
         entity = JawafEntity.objects.filter(display_name__iexact=name).first()
         if entity:
             self.stats["entities_reused"] += 1
-            logger.debug(f"Reusing entity: {name}")
+            logger.info(f"Reusing entity: {name} (ID: {entity.id})")
         else:
             entity = JawafEntity.objects.create(display_name=name)
             self.stats["entities_created"] += 1
-            logger.debug(f"Created entity: {name}")
+            logger.info(f"Created entity: {name} (ID: {entity.id})")
 
         self.entity_cache[name] = entity
         return entity
@@ -353,7 +353,7 @@ class CIAADraftCaseService:
                         .first()
                     ):
                         self.stats["sources_reused"] += 1
-                        logger.debug(f"Reusing source: {title}")
+                        logger.info(f"Reusing source: {title} (ID: {source.source_id})")
                         return source
             else:
                 for url in url_list:
@@ -362,7 +362,9 @@ class CIAADraftCaseService:
                     ):
                         if isinstance(source.url, list) and url in source.url:
                             self.stats["sources_reused"] += 1
-                            logger.debug(f"Reusing source: {title}")
+                            logger.info(
+                                f"Reusing source: {title} (ID: {source.source_id})"
+                            )
                             return source
 
         # Try to find by title (only if no URL provided)
@@ -371,7 +373,7 @@ class CIAADraftCaseService:
                 title=title, is_deleted=False
             ).first():
                 self.stats["sources_reused"] += 1
-                logger.debug(f"Reusing source: {title}")
+                logger.info(f"Reusing source: {title} (ID: {source.source_id})")
                 return source
 
         # Create new source
@@ -379,5 +381,5 @@ class CIAADraftCaseService:
             title=title, url=url_list, source_type=source_type
         )
         self.stats["sources_created"] += 1
-        logger.debug(f"Created source: {title}")
+        logger.info(f"Created source: {title} (ID: {source.source_id})")
         return source
